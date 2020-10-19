@@ -18,7 +18,7 @@ http://www.cs.uakron.edu/~duan/class/445/Projects/Project2-BLAST-COVID19.pdf
   * RNA
 * How many genes does this virus genome contain; what are their names?
   *  11 genes
-    ** ORF 1AB
+  * ORF 1AB
     - S
     - ORF 3A
     - E
