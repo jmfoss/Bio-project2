@@ -18,17 +18,17 @@ http://www.cs.uakron.edu/~duan/class/445/Projects/Project2-BLAST-COVID19.pdf
   * RNA
 * How many genes does this virus genome contain; what are their names?
   *  11 genes
-    * ORF 1AB
-    * S
-    * ORF 3A
-    * E
-    * M
-    * ORF 6
-    * ORF 7A
-    * ORF 7B
-    * ORF 8
-    * N
-    * ORF 10
+    - ORF 1AB
+    - S
+    - ORF 3A
+    - E
+    - M
+    - ORF 6
+    - ORF 7A
+    - ORF 7B
+    - ORF 8
+    - N
+    - ORF 10
   
 * What does CDS mean?
 * How many CDSs are there?
