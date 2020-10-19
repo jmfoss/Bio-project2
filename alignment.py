@@ -1,6 +1,13 @@
+from Bio import pairwise2
+from Bio.pairwise2 import format_alignment
+
+
 def main():
     n_mers_gene = get_gene(28566, 29807, "MERS_sequence.txt")
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
+    alignments = pairwise2.align.globalms(n_mers_gene, n_covid_gene, 2, -1, -0.5, -0.1)
+    for a in alignments:
+        print(format_alignment(*a))
 
 
 # param: start and end index of dna segment
