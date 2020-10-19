@@ -32,5 +32,8 @@ http://www.cs.uakron.edu/~duan/class/445/Projects/Project2-BLAST-COVID19.pdf
 * What does CDS mean?
   * Coding Sequence
 * How many CDSs are there?
+  * 12 Coding Sequences
 * How many proteins does the virus genome code; What are they?
+  * 38 proteins
+    * YP_00972(4389 - 5255).1
 
