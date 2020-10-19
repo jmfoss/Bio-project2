@@ -5,7 +5,7 @@ def main():
 # param: start and end index of dna segment
 # return: string of rna segment 3'-5'
 def get_gene(begin, end):
-    sequence = open("sequence.fasta", "r").read()
+    sequence = open("sequence.txt", "r").read()
     sequence = sequence.replace("\n", "")
     return sequence[begin - 1: end]
 
