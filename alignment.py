@@ -1,6 +1,7 @@
 def main():
-    n_mers_gene = get_gene(28274, 29533, "MERS_sequence.txt")
+    n_mers_gene = get_gene(28566, 29807, "MERS_sequence.txt")
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
+
 
 # param: start and end index of dna segment
 # return: string of rna segment 3'-5'
