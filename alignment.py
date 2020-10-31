@@ -77,6 +77,26 @@ def get_global_alignment(seqA, seqB):
     alignment['start'] = 0
     alignment['end'] = len(alignment['seqA'])
     return alignment
+
+def countIndels(seqA, seqB):
+    insertions = 0
+    deletions = 0
+    for nuc in seqA:
+        if nuc == '-':
+            # A gap means there was a deletion in one sequence, but an insertion
+            # for the other, so increment both.
+            insertions += 1
+            deletions += 1
+            
+    for nuc in seqB:
+        if nuc == '-':
+            # A gap means there was a deletion in one sequence, but an insertion
+            # for the other, so increment both.
+            insertions += 1
+            deletions += 1
+    
+    return insertions + deletions
+
 def main():
     # Loading genes
     n_mers_gene = get_gene(28566, 29807, "MERS_sequence.txt")
@@ -88,17 +108,20 @@ def main():
     # Mutation count
     non_syn = 0
     syn = 0
+    indel = 0
     # Printing alignment
     for codon in range(global_alignment['start'], global_alignment['end'], 3):
         codonA = global_alignment['seqA'][codon: codon + 3]
         codonB = global_alignment['seqB'][codon: codon + 3]
-        if codonA != codonB:
+        if codonA != codonB and codonA in table and codonB in table:
             if table[codonA] != table[codonB]:
                 non_syn += 1
             else:
                 syn += 1
+        indel = countIndels(global_alignment['seqA'], global_alignment['seqB'])
 
     print(global_alignment)
+    print(indel)
 
 
 # param: start and end index of dna segment
