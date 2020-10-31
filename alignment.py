@@ -34,7 +34,7 @@ def main():
     non_syn = 0
     syn = 0
     # Printing alignment
-    for codon in range(global_alignments.start, global_alignments.end, 3):
+    for codon in range(global_alignments[0].start, global_alignments[0].end, 3):
         codonA = global_alignments[0].seqA[codon: codon + 3]
         codonB = global_alignments[0].seqB[codon: codon + 3]
         if codonA != codonB:
