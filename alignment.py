@@ -1,6 +1,16 @@
 from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
 
+
+class Alignment:
+    seqA = str()
+    seqB = str()
+    score = int()
+    start = int()
+    end = int()
+
+
+# Dictionary of codons and amino acids
 table = {
     'ATA': 'I', 'ATC': 'I', 'ATT': 'I', 'ATG': 'M',
     'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T',
@@ -21,81 +31,104 @@ table = {
 }
 
 
+# Given two sequences, returns alignment object
 def get_global_alignment(seqA, seqB):
+    # Number of columns and rows
     col = ' ' + seqA
     row = ' ' + seqB
+
     # 0: align
     # 1 : Gap top
     # 2 : Gap low
+
+    # Creates matrix for finding alignment
     matrix = [[(0, 0) for i in range(len(row))] for j in range(len(col))]
+
     for indexB in range(len(row)):
         for indexA in range(len(col)):
+            # Checks if both are empty
             if col[indexA] == ' ' and row[indexB] == ' ':
                 break
+            # Checks if seqA is empty
             elif col[indexA] == ' ':
                 matrix[indexA][indexB] = (1, matrix[indexA][indexB - 1][1] - 2)
+            # Checks if seqB iis empty
             elif row[indexB] == ' ':
                 matrix[indexA][indexB] = (2, matrix[indexA - 1][indexB][1] - 2)
             else:
                 # Check align
                 if col[indexA] == row[indexB]:
+                    # if match
                     matrix[indexA][indexB] = (0, matrix[indexA - 1][indexB - 1][1] + 1)
                 else:
+                    # if mismatch
                     matrix[indexA][indexB] = (0, matrix[indexA - 1][indexB - 1][1] - 1)
 
                 # Check top gap
                 local_score = matrix[indexA][indexB - 1][1] - 2
-                matrix[indexA][indexB] = (1, local_score) if local_score > matrix[indexA][indexB][1] else matrix[indexA][indexB]
+                matrix[indexA][indexB] = (1, local_score) if local_score > matrix[indexA][indexB][1] else \
+                    matrix[indexA][indexB]
 
                 # Check low gap
                 local_score = matrix[indexA - 1][indexB][1] - 2
-                matrix[indexA][indexB] = (2, local_score) if local_score > matrix[indexA][indexB][1] else matrix[indexA][indexB]
+                matrix[indexA][indexB] = (2, local_score) if local_score > matrix[indexA][indexB][1] else \
+                    matrix[indexA][indexB]
+    # Used for iterating through matrix backwards
     indexA = len(col) - 1
     indexB = len(row) - 1
-    alignment = dict()
-    alignment['seqA'] = str()
-    alignment['seqB'] = str()
-    print(matrix)
-    alignment['score'] = matrix[indexA][indexB][1]
+
+    # Creates alignment object
+    alignment = Alignment()
+    # Assigns score
+    alignment.score = matrix[indexA][indexB][1]
+
+    # Finds alignment backwards
     while indexA != 0 and indexB != 0:
         if matrix[indexA][indexB][0] == 0:
-            alignment['seqA'] += col[indexA]
-            alignment['seqB'] += row[indexB]
+            alignment.seqA += col[indexA]
+            alignment.seqB += row[indexB]
             indexA -= 1
             indexB -= 1
         elif matrix[indexA][indexB][0] == 1:
-            alignment['seqA'] += '-'
-            alignment['seqB'] += row[indexB]
+            alignment.seqA += '-'
+            alignment.seqB += row[indexB]
             indexB -= 1
         else:
-            alignment['seqA'] += col[indexA]
-            alignment['seqB'] += '-'
+            alignment.seqA += col[indexA]
+            alignment.seqB += '-'
             indexA -= 1
 
-    alignment['seqA'] = alignment['seqA'][::-1]
-    alignment['seqB'] = alignment['seqB'][::-1]
-    alignment['start'] = 0
-    alignment['end'] = len(alignment['seqA'])
+    # Reverses sequences
+    alignment.seqA = alignment.seqA[::-1]
+    alignment.seqB = alignment.seqB[::-1]
+
+    # Assigns start and end points
+    alignment.start = 0
+    alignment.end = len(alignment.seqA)
     return alignment
 
-def countIndels(seqA, seqB):
+
+# Given an alignment object
+# Return number of insertion/deletions
+def countIndels(alignment):
     insertions = 0
     deletions = 0
-    for nuc in seqA:
+    for nuc in alignment.seqA:
         if nuc == '-':
             # A gap means there was a deletion in one sequence, but an insertion
             # for the other, so increment both.
             insertions += 1
             deletions += 1
-            
-    for nuc in seqB:
+
+    for nuc in alignment.seqB:
         if nuc == '-':
             # A gap means there was a deletion in one sequence, but an insertion
             # for the other, so increment both.
             insertions += 1
             deletions += 1
-    
+
     return insertions + deletions
+
 
 def main():
     # Loading genes
@@ -103,25 +136,25 @@ def main():
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
 
     # Aligning genes
-    global_alignment = get_global_alignment(n_mers_gene, n_covid_gene)
 
-    # Mutation count
-    non_syn = 0
-    syn = 0
-    indel = 0
-    # Printing alignment
-    for codon in range(global_alignment['start'], global_alignment['end'], 3):
-        codonA = global_alignment['seqA'][codon: codon + 3]
-        codonB = global_alignment['seqB'][codon: codon + 3]
+    # display results and statistics
+
+
+# Given alignment object
+# Returns tuple of mutations (non_syn, syn)
+def find_mutations(alignment):
+    # First: non_syn
+    # Second: syn
+    mutations = (0, 0)
+    for codon in range(alignment.start, alignment.end, 3):
+        codonA = alignment.seqA[codon: codon + 3]
+        codonB = alignment.seqB[codon: codon + 3]
         if codonA != codonB and codonA in table and codonB in table:
             if table[codonA] != table[codonB]:
-                non_syn += 1
+                mutations[0] += 1
             else:
-                syn += 1
-        indel = countIndels(global_alignment['seqA'], global_alignment['seqB'])
-
-    print(global_alignment)
-    print(indel)
+                mutations[1] += 1
+    return mutations
 
 
 # param: start and end index of dna segment
