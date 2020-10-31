@@ -21,29 +21,85 @@ table = {
 }
 
 
+def get_global_alignment(seqA, seqB):
+    col = ' ' + seqA
+    row = ' ' + seqB
+    # 0: align
+    # 1 : Gap top
+    # 2 : Gap low
+    matrix = [[(0, 0) for i in range(len(row))] for j in range(len(col))]
+    for indexB in range(len(row)):
+        for indexA in range(len(col)):
+            if col[indexA] == ' ' and row[indexB] == ' ':
+                break
+            elif col[indexA] == ' ':
+                matrix[indexA][indexB] = (1, matrix[indexA][indexB - 1][1] - 2)
+            elif row[indexB] == ' ':
+                matrix[indexA][indexB] = (2, matrix[indexA - 1][indexB][1] - 2)
+            else:
+                # Check align
+                if col[indexA] == row[indexB]:
+                    matrix[indexA][indexB] = (0, matrix[indexA - 1][indexB - 1][1] + 1)
+                else:
+                    matrix[indexA][indexB] = (0, matrix[indexA - 1][indexB - 1][1] - 1)
+
+                # Check top gap
+                local_score = matrix[indexA][indexB - 1][1] - 2
+                matrix[indexA][indexB] = (1, local_score) if local_score > matrix[indexA][indexB][1] else matrix[indexA][indexB]
+
+                # Check low gap
+                local_score = matrix[indexA - 1][indexB][1] - 2
+                matrix[indexA][indexB] = (2, local_score) if local_score > matrix[indexA][indexB][1] else matrix[indexA][indexB]
+    indexA = len(col) - 1
+    indexB = len(row) - 1
+    alignment = dict()
+    alignment['seqA'] = str()
+    alignment['seqB'] = str()
+    print(matrix)
+    alignment['score'] = matrix[indexA][indexB][1]
+    while indexA != 0 and indexB != 0:
+        if matrix[indexA][indexB][0] == 0:
+            alignment['seqA'] += col[indexA]
+            alignment['seqB'] += row[indexB]
+            indexA -= 1
+            indexB -= 1
+        elif matrix[indexA][indexB][0] == 1:
+            alignment['seqA'] += '-'
+            alignment['seqB'] += row[indexB]
+            indexB -= 1
+        else:
+            alignment['seqA'] += col[indexA]
+            alignment['seqB'] += '-'
+            indexA -= 1
+
+    alignment['seqA'] = alignment['seqA'][::-1]
+    alignment['seqB'] = alignment['seqB'][::-1]
+    alignment['start'] = 0
+    alignment['end'] = len(alignment['seqA'])
+    return alignment
 def main():
     # Loading genes
     n_mers_gene = get_gene(28566, 29807, "MERS_sequence.txt")
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
 
     # Aligning genes
-    global_alignments = pairwise2.align.globalms(n_mers_gene, n_covid_gene, 1, -1, -2, -2)
-    local_alignments = pairwise2.align.localms(n_mers_gene, n_covid_gene, 1, -1, -2, -2)
+    global_alignment = get_global_alignment(n_mers_gene, n_covid_gene)
 
     # Mutation count
     non_syn = 0
     syn = 0
     # Printing alignment
-    for codon in range(global_alignments[0].start, global_alignments[0].end, 3):
-        codonA = global_alignments[0].seqA[codon: codon + 3]
-        codonB = global_alignments[0].seqB[codon: codon + 3]
+    for codon in range(global_alignment['start'], global_alignment['end'], 3):
+        codonA = global_alignment['seqA'][codon: codon + 3]
+        codonB = global_alignment['seqB'][codon: codon + 3]
         if codonA != codonB:
             if table[codonA] != table[codonB]:
                 non_syn += 1
             else:
                 syn += 1
 
-    print(global_alignments[0])
+    print(global_alignment)
+
 
 # param: start and end index of dna segment
 # return: string of rna segment 3'-5'
