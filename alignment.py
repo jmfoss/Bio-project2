@@ -113,19 +113,29 @@ def get_global_alignment(seqA, seqB):
 def countIndels(alignment):
     insertions = 0
     deletions = 0
-    for nuc in alignment.seqA:
+    prev = False
+    for nuc in alignment.seqA:      
         if nuc == '-':
-            # A gap means there was a deletion in one sequence, but an insertion
-            # for the other, so increment both.
-            insertions += 1
-            deletions += 1
+            if prev == False:
+                # A gap means there was a deletion in one sequence, but an insertion
+                # for the other, so increment both.
+                insertions += 1
+                deletions += 1
+                prev = True
+            else:
+                prev = False
 
-    for nuc in alignment.seqB:
+    prev = False
+    for nuc in alignment.seqB:            
         if nuc == '-':
-            # A gap means there was a deletion in one sequence, but an insertion
-            # for the other, so increment both.
-            insertions += 1
-            deletions += 1
+            if prev == False:
+                # A gap means there was a deletion in one sequence, but an insertion
+                # for the other, so increment both.
+                insertions += 1
+                deletions += 1
+                prev = True
+            else:
+                prev = False
 
     return insertions + deletions
 
