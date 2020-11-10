@@ -1,3 +1,7 @@
+# Pairwise alignment project 2
+# Bioinformatics
+# Needleman-Wunsch
+
 from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
 
@@ -139,38 +143,27 @@ def countIndels(alignment):
 
 
 def main():
-    # Loading genes
+    # Load genes
     n_mers_gene = get_gene(28566, 29807, "MERS_sequence.txt")
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
 
-    # Aligning genes
-    global_alignment = get_global_alignment(n_mers_gene, n_covid_gene)
-    middle = str()
-    for a, b in zip(global_alignment.seqA, global_alignment.seqB):
-        if a == b:
-            middle += '|'
-        elif a == '-' or b == '-':
-            middle += ' '
-        else:
-            middle += '.'
-    print("Our alignment")
-    print(global_alignment.seqA)
-    print(middle)
-    print(global_alignment.seqB)
-
-    mutations = find_mutations(global_alignment)
-    indel = countIndels(global_alignment)
-
-    print("  Score=" + str(global_alignment.score))
-    print("\nindel: " + str(indel))
-    print("non-syn mutations: " + str(mutations[0]))
-    print("syn mutations: " + str(mutations[1]))
-
+    # Align genes
+        #needs finished
+    # Collect mutations and insertion/deletion counts
+        #needs finished
+    # Display Results (Alignment, Score, Syn and Non-Syn mutation, insertions/deletions)
+        #needs finished
+        
+    # Bio python alignment for comparison
     print("\nBio Python Alignment")
     global_alignments = pairwise2.align.globalms(n_mers_gene, n_covid_gene, 1, -1, -2, -2)
-    print(format_alignment(*global_alignments[0]))
+    
+    # Bio python mutation and insertion/deletion count
     mutations = find_mutations(global_alignments[0])
     indel = countIndels(global_alignments[0])
+    
+    # Display Bio python Results (Alignment, Score, Syn and Non-Syn mutation, insertions/deletions)
+    print(format_alignment(*global_alignments[0]))
     print("indel: " + str(indel))
     print("non-syn mutations: " + str(mutations[0]))
     print("syn mutations: " + str(mutations[1]))
