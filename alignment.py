@@ -120,7 +120,6 @@ def countIndels(alignment):
                 # A gap means there was a deletion in one sequence, but an insertion
                 # for the other, so increment both.
                 insertions += 1
-                deletions += 1
                 prev = True
             else:
                 prev = False
@@ -131,7 +130,6 @@ def countIndels(alignment):
             if prev == False:
                 # A gap means there was a deletion in one sequence, but an insertion
                 # for the other, so increment both.
-                insertions += 1
                 deletions += 1
                 prev = True
             else:
@@ -146,8 +144,36 @@ def main():
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
 
     # Aligning genes
+    global_alignment = get_global_alignment(n_mers_gene, n_covid_gene)
+    middle = str()
+    for a, b in zip(global_alignment.seqA, global_alignment.seqB):
+        if a == b:
+            middle += '|'
+        elif a == '-' or b == '-':
+            middle += ' '
+        else:
+            middle += '.'
+    print("Our alignment")
+    print(global_alignment.seqA)
+    print(middle)
+    print(global_alignment.seqB)
 
-    # display results and statistics
+    mutations = find_mutations(global_alignment)
+    indel = countIndels(global_alignment)
+
+    print("  Score=" + str(global_alignment.score))
+    print("\nindel: " + str(indel))
+    print("non-syn mutations: " + str(mutations[0]))
+    print("syn mutations: " + str(mutations[1]))
+
+    print("\nBio Python Alignment")
+    global_alignments = pairwise2.align.globalms(n_mers_gene, n_covid_gene, 1, -1, -2, -2)
+    print(format_alignment(*global_alignments[0]))
+    mutations = find_mutations(global_alignments[0])
+    indel = countIndels(global_alignments[0])
+    print("indel: " + str(indel))
+    print("non-syn mutations: " + str(mutations[0]))
+    print("syn mutations: " + str(mutations[1]))
 
 
 # Given alignment object
@@ -155,7 +181,7 @@ def main():
 def find_mutations(alignment):
     # First: non_syn
     # Second: syn
-    mutations = (0, 0)
+    mutations = [0, 0]
     for codon in range(alignment.start, alignment.end, 3):
         codonA = alignment.seqA[codon: codon + 3]
         codonB = alignment.seqB[codon: codon + 3]
