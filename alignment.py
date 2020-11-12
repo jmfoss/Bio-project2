@@ -148,11 +148,29 @@ def main():
     n_covid_gene = get_gene(28274, 29533, "COVID_sequence.txt")
 
     # Align genes
-        #needs finished
+    local_alignments = get_global_alignment(n_mers_gene, n_covid_gene)
+
     # Collect mutations and insertion/deletion counts
-        #needs finished
+    mutations = find_mutations(local_alignments)
+    indel = countIndels(local_alignments)
+    connect = str()
+    for a, b in zip(local_alignments.seqA, local_alignments.seqB):
+        if a == b:
+            connect += '|'
+        elif a == '-' or b == '-':
+            connect += ' '
+        else:
+            connect += '.'
+    
     # Display Results (Alignment, Score, Syn and Non-Syn mutation, insertions/deletions)
-        #needs finished
+    print('pairwise')
+    print(local_alignments.seqA)
+    print(connect)
+    print(local_alignments.seqB)
+    print("indel: " + str(indel))
+    print("non-syn mutations: " + str(mutations[0]))
+    print("syn mutations: " + str(mutations[1]))
+
         
     # Bio python alignment for comparison
     print("\nBio Python Alignment")
